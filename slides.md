@@ -25,6 +25,7 @@ Jorge Gómez Zarzosa [@jorgegomzar](https://github.com/jorgegomzar)
 
 ---
 layout: center
+zoom: 0.8
 ---
 
 # Tabla de contenidos
@@ -232,9 +233,9 @@ git config user.email
 
 ---
 
-<v-click>
-
 ## SSH vs HTTPS
+
+<v-click>
 
 <div class="text-sm">
 
@@ -354,8 +355,10 @@ layout: cover
 # Comandos de Git
 
 ---
+zoom: 0.8
+---
 
-## git status
+**git status**
 
 ````md magic-move
 ```bash
@@ -408,7 +411,7 @@ git status
 
 <v-click>
 
-## git add + git restore
+**git add + git restore**
 
 ````md magic-move
 ```bash
@@ -443,7 +446,7 @@ git add <fichero[s]>
 
 <v-click>
 
-## git commit
+**git commit**
 
 ````md magic-move
 ```bash
@@ -474,7 +477,7 @@ git commit -m "feat: mensaje"
 </v-click>
 <v-click>
 
-## git log
+**git log**
 
 ````md magic-move
 ```bash
@@ -526,7 +529,7 @@ git log
 
 <v-click>
 
-## git reflog
+**git reflog**
 
 ````md magic-move
 ```bash
@@ -549,8 +552,10 @@ git reflog
 </v-click>
 
 ---
+zoom: 0.8
+---
 
-## git pull
+**git pull**
 
 ````md magic-move
 ```bash
@@ -608,7 +613,7 @@ git pull
 ````
 <v-click>
 
-## git clone
+**git clone**
 
 ````md magic-move
 ```bash
@@ -632,7 +637,7 @@ git clone
 </v-click>
 <v-click>
 
-## git push
+**git push**
 
 ````md magic-move
 ```bash
@@ -651,8 +656,7 @@ To github.com:GrupoUniversitarioDeInformatica/TallerDocker2025.git
    fa45939..57417ae  main -> main
 ```
 ```bash
-# peligroso! Usadlo SOLO si sabéis lo que estáis haciendo
-git push -f
+git push -f  # peligroso! Usadlo SOLO si sabéis lo que estáis haciendo
 ```
 ```bash
 git push
@@ -661,7 +665,7 @@ git push
 </v-click>
 <v-click>
 
-## git merge
+**git merge**
 
 ````md magic-move
 ```bash
@@ -681,15 +685,14 @@ Merge made by the 'ort' strategy.
  1 file changed, 1 insertion(+), 1 deletion(-)
 ```
 ```bash
-# Crear un merge commit incluso si es fast-forward
-git merge --no-ff feature-branch
+git merge --no-ff feature-branch  # Crear un merge commit incluso si es fast-forward
 ```
 ````
 </v-click>
 
 <v-click>
 
-## git rebase
+**git rebase**
 
 ````md magic-move
 ```bash
@@ -705,11 +708,10 @@ Applying: Final touches
 Successfully rebased and updated refs/heads/feature-branch.
 ```
 ```bash
-# Rebase interactivo para editar commits
-git rebase -i HEAD~3
+git rebase -i HEAD~3  # Rebase interactivo para editar commits
 ```
 ```bash
-# En caso de conflictos durante rebase
+//# En caso de conflictos durante rebase
 git rebase --continue  # Después de resolver conflictos
 git rebase --abort     # Cancelar el rebase
 ```
@@ -734,7 +736,7 @@ layout: two-cols
 
 </v-click>
 
-<div v-click="[3, 5]" v-motion
+<div v-click="[3,5]" v-motion
   :initial="{ x: -50 }"
   :enter="{ x: 0 }"
   :leave="{ x: 50 }"
@@ -757,7 +759,7 @@ layout: two-cols
 
 </v-click>
 
-<div v-click="[4, 5]" v-motion
+<div v-click="[4,5]" v-motion
   :initial="{ x: 50 }"
   :enter="{ x: 0 }"
   :leave="{ x: 50 }"
@@ -937,6 +939,7 @@ git merge feature-branch
 
 ---
 layout: cover
+level: 2
 ---
 
 # Resolución forzosa ⚠️☠️
@@ -1137,33 +1140,28 @@ layout: cover
 Una interfaz de terminal para Git más visual e intuitiva.
 
 ---
-layout: image-right
+layout: two-cols
 image: https://github.com/jesseduffield/lazygit/raw/master/docs/resources/demo.gif
 backgroundSize: contain
-zoom: 0.7
 ---
 
-
-## Instalación
+**Instalación**
 
 <v-click>
 
 ```bash
-# macOS
-brew install lazygit
+brew install lazygit  # macOS
 
-# Ubuntu/Debian
-sudo apt install lazygit
+sudo apt install lazygit  # Ubuntu/Debian
 
-# Windows
-scoop install lazygit
+scoop install lazygit  # Windows
 ```
 
 </v-click>
 
 <v-click>
 
-## Características principales
+**Características principales**
 
 - **Interfaz visual** para el estado del repo
 - **Navegación con teclado** intuitiva
@@ -1174,18 +1172,20 @@ scoop install lazygit
 
 </v-click>
 
+::right::
+
 <v-click>
 
-## Uso básico
+**Uso básico**
+
+- Navegación: ↑↓←→, Tab, Enter, Esc
+- Staging: Espacio
+- Commit: c
+- Push: P
+
 
 ```bash
-# Abrir lazygit en el directorio actual
 lazygit
-
-# Navegación: ↑↓←→, Tab, Enter, Esc
-# Staging: Espacio
-# Commit: c
-# Push: P
 ```
 
 </v-click>
