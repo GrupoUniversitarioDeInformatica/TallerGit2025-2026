@@ -183,10 +183,104 @@ Para hostear repositorios VCS en la nube y colaborar con otros devs.
 - ...
 
 ---
-layout: default
+transition: slide-up
 ---
 
-# Cómo iniciar un repositorio Git
+# Configuración inicial
+
+Antes de empezar a usar Git, necesitas configurar tu identidad.
+
+<v-click>
+
+### Configuración global
+
+```bash
+git config --global user.name "Tu Nombre"
+git config --global user.email "tu@email.com"
+```
+
+</v-click>
+
+<v-click>
+
+### Configuraciones útiles
+
+```bash
+# Editor por defecto
+git config --global core.editor "code --wait"
+
+# Colores en terminal
+git config --global color.ui auto
+
+# Rama por defecto
+git config --global init.defaultBranch main
+```
+
+</v-click>
+
+<v-click>
+
+### Ver configuración
+
+```bash
+git config --list
+git config user.name
+git config user.email
+```
+
+</v-click>
+
+---
+
+<v-click>
+
+## SSH vs HTTPS
+
+<div class="text-sm">
+
+**HTTPS** (más fácil para empezar)
+```bash
+git clone https://github.com/user/repo.git
+```
+
+**SSH** (más seguro, sin contraseñas)
+```bash
+# Generar clave SSH
+ssh-keygen -t ed25519 -C "tu@email.com"
+
+# Añadir a GitHub/GitLab
+cat ~/.ssh/id_ed25519.pub
+
+# Clonar con SSH
+git clone git@github.com:user/repo.git
+```
+
+</div>
+
+</v-click>
+
+<v-click>
+
+### Alias útiles
+
+```bash
+git config --global alias.st status
+git config --global alias.co checkout
+git config --global alias.br branch
+git config --global alias.ci commit
+git config --global alias.unstage 'reset HEAD --'
+```
+
+</v-click>
+
+<style>
+.two-cols-header {
+  column-gap: 80px;
+}
+</style>
+
+---
+---
 Un repositorio Git es un directorio normal con un subdirectorio `.git/`
 
 Uno nuevo
@@ -228,10 +322,9 @@ backgroundSize: 100% 70%
 # Conceptos básicos
 A Linus le gustaba comparar el estado de un repositorio con un árbol para representar la estructura de directorios y el contenido de archivos de un proyecto en un momento dado.
 
-### Commit
-Los <i>nudos</i> del árbol. Cada <span v-mark.circle.orange="1">versión</span> por la que ha pasado el repositorio.
+**Commit**
 
-<v-click>&nbsp;</v-click>
+Los <i>nudos</i> del árbol. Cada <span v-mark.circle.orange="1">versión</span> por la que ha pasado el repositorio.
 
 <Arrow
     v-click
@@ -246,10 +339,12 @@ Los <i>nudos</i> del árbol. Cada <span v-mark.circle.orange="1">versión</span>
       :click-3="{ x: 80 }"
 />
 
-### Branch
+**Branch**
+
 Las ramificaciones, que crecen en paralelo al tronco (rama principal)
 
-### HEAD
+**HEAD**
+
 Un puntero que nos dice en qué commit nos encontramos
 
 ---
@@ -506,6 +601,7 @@ Fast-forward
  15 files changed, 305 insertions(+), 89 deletions(-)
  create mode 100644 reporting_tool/graphql/common/statistics.py
 ```
+
 ```bash
 git pull
 ```
@@ -567,236 +663,558 @@ git push
 
 ## git merge
 
+````md magic-move
+```bash
+git merge feature-branch
+```
+```bash {*|2|3-4|*}
+git merge feature-branch
+Updating a1b2c3d..e4f5g6h
+Fast-forward
+ file.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+```
+```bash {*|2-3|4|*}
+git merge feature-branch
+Merge made by the 'ort' strategy.
+ file.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+```
+```bash
+# Crear un merge commit incluso si es fast-forward
+git merge --no-ff feature-branch
+```
+````
 </v-click>
+
 <v-click>
 
 ## git rebase
 
+````md magic-move
+```bash
+git rebase main
+```
+```bash {*|2-6|7-8|*}
+git rebase main
+First, rewinding head to replay your work on top of it...
+Applying: Add new feature
+Applying: Fix bug in feature
+Applying: Update documentation
+Applying: Final touches
+Successfully rebased and updated refs/heads/feature-branch.
+```
+```bash
+# Rebase interactivo para editar commits
+git rebase -i HEAD~3
+```
+```bash
+# En caso de conflictos durante rebase
+git rebase --continue  # Después de resolver conflictos
+git rebase --abort     # Cancelar el rebase
+```
+````
+
+</v-click>
+
+---
+layout: two-cols
+---
+
+## Merge
+
+<v-click>
+
+- Preserva el historial original
+- Crea commits de merge
+- Más seguro para principiantes
+- Historial más complejo
+
+<br>
+
+</v-click>
+
+<div v-click="[3, 5]" v-motion
+  :initial="{ x: -50 }"
+  :enter="{ x: 0 }"
+  :leave="{ x: 50 }"
+>
+    <img src="https://blog.git-init.com/content/images/2023/06/image-3.png" width="400" height="100"/>
+</div>
+
+::right::
+
+## Rebase
+
+<v-click>
+
+- Historial lineal y limpio
+- Reescribe commits
+- Más peligroso si se usa mal
+- Mejor para features pequeñas
+
+<br>
+
+</v-click>
+
+<div v-click="[4, 5]" v-motion
+  :initial="{ x: 50 }"
+  :enter="{ x: 0 }"
+  :leave="{ x: 50 }"
+>
+    <img src="https://blog.git-init.com/content/images/2023/06/image-4.png" width="400" height="100"/>
+</div>
+
+---
+transition: slide-left
+---
+
+# Trabajando con ramas (branches)
+
+Las ramas permiten desarrollar funcionalidades en paralelo sin afectar la rama principal.
+
+<v-click>
+
+## Comandos básicos
+
+````md magic-move
+```bash
+# Ver todas las ramas
+git branch
+```
+```bash {*|2|3|*}
+git branch
+  feature/login
+* main
+  hotfix/critical-bug
+```
+```bash
+# Crear nueva rama
+git branch nueva-rama
+```
+```bash
+# Cambiar a una rama
+git checkout nueva-rama
+```
+```bash
+# Crear y cambiar en un comando
+git checkout -b feature/nueva-funcionalidad
+```
+```bash
+# Versión moderna (Git 2.23+)
+git switch -c feature/nueva-funcionalidad
+```
+````
+
+</v-click>
+
+<v-click>
+
+## Gestión de ramas
+
+```bash
+# Eliminar rama local
+git branch -d feature/completada
+
+# Eliminar rama remota
+git push origin --delete feature/completada
+
+# Ver ramas remotas
+git branch -r
+
+# Ver todas las ramas (locales y remotas)
+git branch -a
+```
+
 </v-click>
 
 ---
 
-# Buenas prácticas
+## Estructura de ramas
 
-- 1 única rama principal (main / master). Siempre debería contener la última versión estable del repositorio
-- No pushear NUNCA directamente a main
-    - En las plataformas de Git se pueden configurar para no permitir pushes directos a main
-    - En su lugar abrir Pull Requests
-- Separar las ramas de dev y release
-    - Si decidimos que master es nuestra rama de release, entonces deberemos tener una rama de desarrollo donde mergearemos todas las features y una vez queramos generar un nuevo release estable mergearemos a master
-- Git pull antes de crear una nueva rama o commitear
-- Conventional commits
-- Semantic Versioning
+<v-click>
 
+- **1 única rama principal** (main/master) → siempre estable
+- **No pushear NUNCA directamente a main**
+- **Pull Requests** para todos los cambios
+- **Separar dev y release** si es necesario
+
+</v-click>
+
+<v-click>
+
+## Workflow recomendado
+
+```bash
+git pull origin main          # Actualizar main
+git checkout -b feature/nueva-funcionalidad
+# ... hacer cambios ...
+git add .
+git commit -m "feat: add nueva funcionalidad"
+git push origin feature/nueva-funcionalidad
+# Abrir Pull Request en GitHub/GitLab
+```
+
+</v-click>
+
+---
+
+## Conventional Commits
+
+[conventionalcommits.org](https://www.conventionalcommits.org/en/v1.0.0/)
+
+<v-click>
+
+```bash
+feat: nueva funcionalidad
+fix: corregir bug
+docs: actualizar documentación
+style: cambios de formato
+refactor: refactorizar código
+test: añadir tests
+chore: tareas de mantenimiento
+```
+
+</v-click>
+
+<v-click>
+
+## Semantic Versioning
+
+[semver.org](https://semver.org/)
+
+</v-click>
+
+<v-click>
+
+`MAJOR.MINOR.PATCH` → `1.4.2`
+
+- **MAJOR**: Cambios incompatibles
+- **MINOR**: Nueva funcionalidad compatible
+- **PATCH**: Bug fixes compatibles
+
+</v-click>
+
+---
+zoom: 0.85
 ---
 
 # Merge conflicts
 
+Los conflictos ocurren cuando Git no puede fusionar automáticamente los cambios de diferentes ramas.
+
+<v-click>
+
+## ¿Cuándo suceden?
+
+- Dos personas modifican la misma línea de código
+- Una persona elimina un archivo que otra ha modificado
+- Cambios incompatibles en la estructura del proyecto
+
+</v-click>
+
+<v-click>
+
+## Resolución
+
+```bash
+git merge feature-branch
+# CONFLICT (content): Merge conflict in file.txt
+# Automatic merge failed; fix conflicts and then commit the result.
+```
+
+</v-click>
+
+<v-click>
+
+1. Abrir el archivo con conflictos
+2. Buscar las marcas `<<<<<<<`, `=======`, `>>>>>>>`
+3. Decidir qué cambios mantener
+4. Eliminar las marcas de conflicto
+5. `git add` y `git commit`
+
+</v-click>
+
+---
+layout: cover
+---
+
+# Resolución forzosa ⚠️☠️
+
+<v-click>
+
+```bash
+git reset --hard <branch>
+```
+
+</v-click>
+
+---
+layout: two-cols
 ---
 
 # .gitignore
 
-Un fichero especial que le dice a .git que ficheros o directorios ignorar a la hora de gestionar las versiones del proyecto.
+Un fichero especial que le dice a Git qué archivos o directorios ignorar.
+
+<v-click>
+
+**¿Por qué es importante?**
+
+- Evitar subir archivos temporales
+- No versionar credenciales
+- Ignorar dependencias que se pueden regenerar
+- Mantener el repo limpio
+
+</v-click>
+
+<v-click>
+
+**Sintaxis básica**
+
+```md [.gitignore]
+# Comentarios
+*.log          # Todos los .log
+node_modules/  # Directorio completo
+!important.log # Excepción
+temp*          # Archivos que empiecen por temp
+```
+
+</v-click>
+
+::right::
+
+<v-click>
+
+## Ejemplos comunes
+
+```md [gitignore]
+# Dependencias
+node_modules/
+venv/
+.env
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+
+# Builds
+dist/
+build/
+*.o
+*.exe
+
+# Logs
+*.log
+logs/
+
+# Credenciales
+.env
+config/secrets.json
+```
+
+</v-click>
 
 ---
+transition: slide-up
+zoom: 0.85
+---
 
-# Githooks
+# Git Hooks
 
+Scripts que se ejecutan automáticamente en ciertos eventos de Git.
+
+<v-click>
+
+## Tipos principales
+
+<div class="grid grid-cols-2 gap-4">
+<div>
+
+### Client-side
+- `pre-commit`: Antes de cada commit
+- `prepare-commit-msg`: Preparar mensaje
+- `commit-msg`: Validar mensaje
+- `post-commit`: Después del commit
+
+</div>
+<div>
+
+### Server-side
+- `pre-receive`: Antes de recibir push
+- `update`: Por cada rama actualizada
+- `post-receive`: Después del push
+
+</div>
+</div>
+
+</v-click>
+
+<v-click>
+
+## Ejemplo: pre-commit
+
+```bash
+#!/bin/sh
+# .git/hooks/pre-commit
+
+# Ejecutar tests antes de commitear
+npm test
+if [ $? -ne 0 ]; then
+  echo "Tests fallaron. Commit cancelado."
+  exit 1
+fi
+
+# Verificar formato de código
+npm run lint
+```
+
+</v-click>
+
+---
+zoom: 0.7
 ---
 
 # GitOps
 
+<v-click>
+
+## Filosofía de desarrollo
+
+> "Git como única fuente de verdad para la infraestructura y aplicaciones"
+
+[Ejemplo: k8s Ingress](https://kubernetes.io/es/docs/concepts/services-networking/ingress/#el-recurso-ingress)
+
+</v-click>
+
+<v-click>
+
+## Principios clave
+
+</v-click>
+
+<v-clicks>
+
+- **Declarativo**: Todo se describe en archivos de configuración
+- **Versionado**: Toda la configuración está en Git
+- **Inmutable**: Los cambios se hacen via pull requests
+- **Reconciliación continua**: Herramientas automatizan el despliegue
+
+</v-clicks>
+
+<v-click>
+
+## Herramientas populares
+
+- **ArgoCD** / **Flux** (Kubernetes)
+- **Terraform** + **Atlantis**
+- **GitHub Actions** / **GitLab CI**
+
+</v-click>
+
+<v-click>
+
+## Beneficios
+
+✅ Trazabilidad completa  
+✅ Rollbacks fáciles  
+✅ Colaboración via PR  
+✅ Auditoría automática
+
+</v-click>
+
+---
+layout: cover
 ---
 
 # Lazygit
 
----
-
-# Gracias por asistir
+Una interfaz de terminal para Git más visual e intuitiva.
 
 ---
-
-# LaTeX
-
-LaTeX is supported out-of-box. Powered by [KaTeX](https://katex.org/).
-
-<div h-3 />
-
-Inline $\sqrt{3x-1}+(1+x)^2$
-
-Block
-$$ {1|3|all}
-\begin{aligned}
-\nabla \cdot \vec{E} &= \frac{\rho}{\varepsilon_0} \\
-\nabla \cdot \vec{B} &= 0 \\
-\nabla \times \vec{E} &= -\frac{\partial\vec{B}}{\partial t} \\
-\nabla \times \vec{B} &= \mu_0\vec{J} + \mu_0\varepsilon_0\frac{\partial\vec{E}}{\partial t}
-\end{aligned}
-$$
-
-[Learn more](https://sli.dev/features/latex)
-
+layout: image-right
+image: https://github.com/jesseduffield/lazygit/raw/master/docs/resources/demo.gif
+backgroundSize: contain
+zoom: 0.7
 ---
 
-# Diagrams
 
-You can create diagrams / graphs from textual descriptions, directly in your Markdown.
+## Instalación
 
-<div class="grid grid-cols-4 gap-5 pt-4 -mb-6">
+<v-click>
 
-```mermaid {scale: 0.5, alt: 'A simple sequence diagram'}
-sequenceDiagram
-    Alice->John: Hello John, how are you?
-    Note over Alice,John: A typical interaction
+```bash
+# macOS
+brew install lazygit
+
+# Ubuntu/Debian
+sudo apt install lazygit
+
+# Windows
+scoop install lazygit
 ```
 
-```mermaid {theme: 'neutral', scale: 0.8}
-graph TD
-B[Text] --> C{Decision}
-C -->|One| D[Result 1]
-C -->|Two| E[Result 2]
+</v-click>
+
+<v-click>
+
+## Características principales
+
+- **Interfaz visual** para el estado del repo
+- **Navegación con teclado** intuitiva
+- **Staging interactivo** de cambios
+- **Resolución visual** de merge conflicts
+- **Historial gráfico** de commits
+- **Gestión de ramas** simplificada
+
+</v-click>
+
+<v-click>
+
+## Uso básico
+
+```bash
+# Abrir lazygit en el directorio actual
+lazygit
+
+# Navegación: ↑↓←→, Tab, Enter, Esc
+# Staging: Espacio
+# Commit: c
+# Push: P
 ```
 
-```mermaid
-mindmap
-  root((mindmap))
-    Origins
-      Long history
-      ::icon(fa fa-book)
-      Popularisation
-        British popular psychology author Tony Buzan
-    Research
-      On effectiveness<br/>and features
-      On Automatic creation
-        Uses
-            Creative techniques
-            Strategic planning
-            Argument mapping
-    Tools
-      Pen and paper
-      Mermaid
-```
-
-```plantuml {scale: 0.7}
-@startuml
-
-package "Some Group" {
-  HTTP - [First Component]
-  [Another Component]
-}
-
-node "Other Groups" {
-  FTP - [Second Component]
-  [First Component] --> FTP
-}
-
-cloud {
-  [Example 1]
-}
-
-database "MySql" {
-  folder "This is my folder" {
-    [Folder 3]
-  }
-  frame "Foo" {
-    [Frame 4]
-  }
-}
-
-[Another Component] --> [Example 1]
-[Example 1] --> [Folder 3]
-[Folder 3] --> [Frame 4]
-
-@enduml
-```
-
-</div>
-
-Learn more: [Mermaid Diagrams](https://sli.dev/features/mermaid) and [PlantUML Diagrams](https://sli.dev/features/plantuml)
-
----
-foo: bar
-dragPos:
-  square: 667,19,167,_,-16
----
-
-# Draggable Elements
-
-Double-click on the draggable elements to edit their positions.
-
-<br>
-
-###### Directive Usage
-
-```md
-<img v-drag="'square'" src="https://sli.dev/logo.png">
-```
-
-<br>
-
-###### Component Usage
-
-```md
-<v-drag text-3xl>
-  <div class="i-carbon:arrow-up" />
-  Use the `v-drag` component to have a draggable container!
-</v-drag>
-```
-
-<v-drag pos="645,209,261,_,-15">
-  <div text-center text-3xl border border-main rounded>
-    Double-click me!
-  </div>
-</v-drag>
-
-<img v-drag="'square'" src="https://sli.dev/logo.png">
-
-###### Draggable Arrow
-
-```md
-<v-drag-arrow two-way />
-```
-
-<v-drag-arrow pos="388,430,253,46" two-way op70 />
-
----
-src: ./pages/imported-slides.md
-hide: false
----
-
----
-
-# Monaco Editor
-
-Slidev provides built-in Monaco Editor support.
-
-Add `{monaco}` to the code block to turn it into an editor:
-
-```ts {monaco}
-import { ref } from 'vue'
-import { emptyArray } from './external'
-
-const arr = ref(emptyArray(10))
-```
-
-Use `{monaco-run}` to create an editor that can execute the code directly in the slide:
-
-```ts {monaco-run}
-import { version } from 'vue'
-import { emptyArray, sayHello } from './external'
-
-sayHello()
-console.log(`vue ${version}`)
-console.log(emptyArray<number>(10).reduce(fib => [...fib, fib.at(-1)! + fib.at(-2)!], [1, 1]))
-```
+</v-click>
 
 ---
 layout: center
 class: text-center
 ---
 
-# Learn More
+# ¡Gracias por asistir!
 
-[Documentation](https://sli.dev) · [GitHub](https://github.com/slidevjs/slidev) · [Showcases](https://sli.dev/resources/showcases)
+<div class="pt-12">
+  <span @click="$slidev.nav.next" class="px-2 py-1 rounded cursor-pointer" hover="bg-white bg-opacity-10">
+    ¿Preguntas? 🤔
+  </span>
+</div>
 
-<PoweredBySlidev mt-10 />
+<div class="pt-12">
+
+## Recursos útiles
+
+[📖 Pro Git Book](https://git-scm.com/book) • [🎮 Learn Git Branching](https://learngitbranching.js.org/) • [📚 Atlassian Git Tutorials](https://www.atlassian.com/git/tutorials)
+
+</div>
+
+<div class="abs-br m-6 flex gap-2">
+  <a href="https://github.com/jorgegomzar" target="_blank" alt="GitHub" title="GitHub"
+    class="text-xl slidev-icon-btn opacity-50 !border-none !hover:text-white">
+    <carbon-logo-github />
+  </a>
+</div>
+
